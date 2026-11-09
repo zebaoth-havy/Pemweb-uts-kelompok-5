@@ -70,7 +70,7 @@ exports.createForm = async (req, res) => {
             action: '/barang-masuk/tambah',
             barang,
             data: {},
-            error: null
+            error: req.query.error || null
         });
 
     } catch (error) {
@@ -132,7 +132,7 @@ exports.editForm = async (req, res) => {
             action: `/barang-masuk/${id}/edit`,
             barang,
             data,
-            error: null
+            error: req.query.error || null
         });
 
     } catch (error) {
