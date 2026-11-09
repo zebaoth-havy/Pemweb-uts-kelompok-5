@@ -1,3 +1,4 @@
+
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
@@ -20,6 +21,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 const barangRoutes = require('./routes/barangRoutes');
 app.use('/barang', barangRoutes);
 
+// Barang Masuk routes
+const masukRoutes = require('./routes/masukRoutes');
+app.use('/barang-masuk', masukRoutes);
+
 // Dashboard
 app.get('/', async (req, res) => {
     res.render('dashboard', {
@@ -31,7 +36,6 @@ app.get('/', async (req, res) => {
 // Aktifkan setelah file routes tersedia.
 
 // app.use('/supplier', require('./routes/supplierRoutes'));
-// app.use('/barang-masuk', require('./routes/masukRoutes'));
 // app.use('/barang-keluar', require('./routes/keluarRoutes'));
 
 // 404 handler
