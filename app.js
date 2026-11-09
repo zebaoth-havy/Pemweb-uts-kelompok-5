@@ -1,12 +1,12 @@
-
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
 
-const { testConnection } = require('./config/db');
+const { db, testConnection } = require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 // EJS configuration
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -26,16 +26,36 @@ app.use('/barang-masuk', masukRoutes);
 
 // Dashboard
 app.get('/', async (req, res) => {
-    res.render('dashboard', {
-        title: 'Dashboard StockFlow'
-    });
+    try {
+        const [barang] = await db.query(
+            'SELECT COUNT(*) AS total FROM barang'
+        );
+
+        const [supplier] = await db.query(
+            'SELECT COUNT(*) AS total FROM suppliers'
+        );
+
+        const [masuk] = await db.query(
+            'SELECT COALESCE(SUM(jumlah), 0) AS total FROM barang_masuk'
+        );
+
+        const [keluar] = await db.query(
+            'SELECT COALESCE(SUM(jumlah), 0) AS total FROM barang_keluar'
+        );
+
+        res.render('dashboard', {
+            title: 'Dashboard StockFlow',
+            totalBarang: barang[0].total,
+            totalSupplier: supplier[0].total,
+            totalMasuk: masuk[0].total,
+            totalKeluar: keluar[0].total
+        });
+
+    } catch (error) {
+        console.error('Dashboard error:', error);
+        res.status(500).send('Gagal memuat dashboard: ' + error.message);
+    }
 });
-
-// Integrasi modul anggota lain
-// Aktifkan setelah file routes tersedia.
-
-// app.use('/supplier', require('./routes/supplierRoutes'));
-// app.use('/barang-keluar', require('./routes/keluarRoutes'));
 
 // 404 handler
 app.use((req, res) => {
