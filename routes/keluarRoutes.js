@@ -5,7 +5,8 @@ const express = require("express");
 const router = express.Router();
 
 // Menghubungkan Routes dengan Controller Barang Keluar
-const keluarController = require("../controllers/keluarController");
+const keluarController = 
+require("../controllers/keluarcontroller");
 
 // READ - Menampilkan daftar transaksi barang keluar
 router.get("/", keluarController.index);
