@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- UPDATE: Form edit berdasarkan ID transaksi -->
+  <h1>Edit Barang Keluar</h1>
+
+  <form
+    action="/barang-keluar/<%= transaksi.id %>/edit"
+    method="POST"
+  >
+
+    <!-- Dropdown barang dengan data sebelumnya terpilih -->
+    <label for="barang_id">Nama Barang</label>
+    <select id="barang_id" name="barang_id" required>
+      <% barang.forEach((item) => { %>
+        <option
+          value="<%= item.id %>"
+          <%= item.id == transaksi.barang_id ? "selected" : "" %>
+        >
+          <%= item.nama %> (Stok: <%= item.stok %>)
+        </option>
+      <% }) %>
+    </select>
+
+    <br><br>
+
+    <!-- Menampilkan tanggal transaksi sebelumnya -->
+    <label for="tanggal">Tanggal Keluar</label>
+    <input
+      type="date"
+      id="tanggal"
+      name="tanggal"
+      value="<%= transaksi.tanggal %>"
+      required
+    >
+
+    <br><br>
+
+    <!-- Menampilkan jumlah transaksi sebelumnya -->
+    <label for="jumlah">Jumlah Keluar</label>
+    <input
+      type="number"
+      id="jumlah"
+      name="jumlah"
+      min="1"
+      step="1"
+      value="<%= transaksi.jumlah %>"
+      required
+    >
+
+    <br><br>
+
+    <!-- Menampilkan tujuan transaksi sebelumnya -->
+    <label for="tujuan">Tujuan Pengeluaran</label>
+    <input
+      type="text"
+      id="tujuan"
+      name="tujuan"
+      maxlength="255"
+      value="<%= transaksi.tujuan %>"
+      required
+    >
+
+    <br><br>
+
+    <!-- Menyimpan perubahan transaksi -->
+    <button type="submit">Update</button>
+
+    <a href="/barang-keluar">Batal</a>
+  </form>
+
+</body>
+</html>
