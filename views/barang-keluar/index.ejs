@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- READ: Menampilkan daftar transaksi -->
+  <h1>Data Barang Keluar</h1>
+
+  <!-- Tombol menuju formulir tambah -->
+  <a href="/barang-keluar/tambah">+ Tambah Barang Keluar</a>
+
+  <!-- Memeriksa apakah data transaksi kosong -->
+  <% if (transaksi.length === 0) { %>
+    <p>Belum ada transaksi barang keluar.</p>
+  <% } else { %>
+
+    <table border="1" cellpadding="10">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama Barang</th>
+          <th>Tanggal</th>
+          <th>Jumlah</th>
+          <th>Tujuan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Mengulang data transaksi dari MySQL -->
+        <% transaksi.forEach((item, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= item.nama_barang %></td>
+            <td><%= item.tanggal %></td>
+            <td><%= item.jumlah %></td>
+            <td><%= item.tujuan %></td>
+            <td>
+              <!-- UPDATE: Membuka formulir edit -->
+              <a href="/barang-keluar/<%= item.id %>/edit">
+                Edit
+              </a>
+
+              <!-- DELETE: Menghapus menggunakan POST -->
+              <form
+                action="/barang-keluar/<%= item.id %>/hapus"
+                method="POST"
+                style="display:inline;"
+                onsubmit="return confirm('Hapus transaksi ini?')"
+              >
+                <button type="submit">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+  <% } %>
+
+</body>
+</html>
