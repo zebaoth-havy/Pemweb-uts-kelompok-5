@@ -2,67 +2,239 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barang Keluar | StockFlow</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            color: #263449;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #7b8798;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 7px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #e0eaff;
+            color: #2455b5;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #00000008;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #edf0f4;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 13px;
+            margin-bottom: 18px;
+            border-radius: 7px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #94a3b8;
+        }
+    </style>
 </head>
+
 <body>
+    <div class="container">
 
-  <!-- READ: Menampilkan daftar transaksi -->
-  <h1>Data Barang Keluar</h1>
+        <div class="header">
+            <div>
+                <h1>Barang Keluar</h1>
+                <div class="subtitle">
+                    Kelola pencatatan transaksi barang keluar.
+                </div>
+            </div>
 
-  <!-- Tombol menuju formulir tambah -->
-  <a href="/barang-keluar/tambah">+ Tambah Barang Keluar</a>
+            <a href="/barang-keluar/tambah" class="btn btn-primary">
+                + Tambah Transaksi
+            </a>
+        </div>
 
-  <!-- Memeriksa apakah data transaksi kosong -->
-  <% if (transaksi.length === 0) { %>
-    <p>Belum ada transaksi barang keluar.</p>
-  <% } else { %>
+        <% if (success) { %>
+            <div class="alert success">
+                <%= success %>
+            </div>
+        <% } %>
 
-    <table border="1" cellpadding="10">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama Barang</th>
-          <th>Tanggal</th>
-          <th>Jumlah</th>
-          <th>Tujuan</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
+        <% if (error) { %>
+            <div class="alert error">
+                <%= error %>
+            </div>
+        <% } %>
 
-      <tbody>
-        <!-- Mengulang data transaksi dari MySQL -->
-        <% transaksi.forEach((item, index) => { %>
-          <tr>
-            <td><%= index + 1 %></td>
-            <td><%= item.nama_barang %></td>
-            <td><%= item.tanggal %></td>
-            <td><%= item.jumlah %></td>
-            <td><%= item.tujuan %></td>
-            <td>
-              <!-- UPDATE: Membuka formulir edit -->
-              <a href="/barang-keluar/<%= item.id %>/edit">
-                Edit
-              </a>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                        <th>Tujuan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
 
-              <!-- DELETE: Menghapus menggunakan POST -->
-              <form
-                action="/barang-keluar/<%= item.id %>/hapus"
-                method="POST"
-                style="display:inline;"
-                onsubmit="return confirm('Hapus transaksi ini?')"
-              >
-                <button type="submit">Hapus</button>
-              </form>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+                <tbody>
+                    <% if (transaksi.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="empty">
+                                Belum ada transaksi barang keluar.
+                            </td>
+                        </tr>
+                    <% } %>
 
-  <% } %>
+                    <% transaksi.forEach((item, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
 
+                            <td>
+                                <%= new Date(item.tanggal).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    timeZone: 'UTC'
+                                }) %>
+                            </td>
+
+                            <td><%= item.kode_barang %></td>
+
+                            <td><%= item.nama_barang %></td>
+
+                            <td>
+                                <strong>
+                                    -<%= item.jumlah %>
+                                </strong>
+                                <%= item.satuan %>
+                            </td>
+
+                            <td><%= item.tujuan || '-' %></td>
+
+                            <td>
+                                <div class="actions">
+                                    <a
+                                        href="/barang-keluar/<%= item.id %>/edit"
+                                        class="btn btn-edit">
+                                        Edit
+                                    </a>
+
+                                    <form
+                                        action="/barang-keluar/<%= item.id %>/delete"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus transaksi ini? Stok barang juga akan disesuaikan.');">
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-delete">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <a href="/" style="color:#2563eb;text-decoration:none;">
+                ← Kembali ke Dashboard
+            </a>
+        </p>
+
+    </div>
 </body>
 </html>
