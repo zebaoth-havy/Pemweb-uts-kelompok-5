@@ -1,30 +1,20 @@
-
-const express = require("express");
-
-// Membuat Router Express untuk modul Barang Keluar
+const express = require('express');
 const router = express.Router();
 
-// Menghubungkan Routes dengan Controller Barang Keluar
-const keluarController = 
-require("../controllers/keluarcontroller");
+const keluarController = require('../controllers/keluarController');
 
-// READ - Menampilkan daftar transaksi barang keluar
-router.get("/", keluarController.index);
+// READ
+router.get('/', keluarController.index);
 
-// CREATE - Menampilkan formulir tambah barang keluar
-router.get("/tambah", keluarController.formTambah);
+// CREATE
+router.get('/tambah', keluarController.createForm);
+router.post('/tambah', keluarController.store);
 
-// CREATE - Menyimpan transaksi baru menggunakan POST
-router.post("/tambah", keluarController.tambah);
+// UPDATE
+router.get('/:id/edit', keluarController.editForm);
+router.post('/:id/edit', keluarController.update);
 
-// UPDATE - Menampilkan formulir edit berdasarkan ID
-router.get("/:id/edit", keluarController.formEdit);
+// DELETE
+router.post('/:id/delete', keluarController.destroy);
 
-// UPDATE - Menyimpan perubahan transaksi menggunakan POST
-router.post("/:id/edit", keluarController.update);
-
-// DELETE - Menghapus transaksi berdasarkan ID menggunakan POST
-router.post("/:id/hapus", keluarController.hapus);
-
-// Mengekspor Router agar dapat digunakan di app.js
 module.exports = router;
