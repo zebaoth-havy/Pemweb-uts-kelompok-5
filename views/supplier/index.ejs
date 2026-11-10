@@ -1,160 +1,136 @@
-
 <%- include('../partials/header') %>
-<%- include('../partials/sidebar', { currentPage: 'supplier' }) %>
+<%- include('../partials/navbar') %>
 
-<main class="main-content">
-    <%- include('../partials/navbar') %>
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTORY / MASTER DATA</span>
+        <h1>Data Supplier</h1>
+        <p>Kelola informasi pemasok barang dalam sistem inventaris.</p>
+    </div>
 
-    <section class="page-content">
-        <div class="page-heading">
-            <div>
-                <span class="eyebrow">MASTER DATA</span>
-                <h1>Data Supplier</h1>
-                <p>Kelola informasi pemasok barang dalam sistem inventaris.</p>
-            </div>
+    <a href="/supplier/tambah" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i>
+        Tambah Supplier
+    </a>
+</div>
 
-            <a href="/supplier/tambah" class="btn btn-primary">
-                <i class="fa-solid fa-plus"></i>
-                Tambah Supplier
-            </a>
+<% if (message) { %>
+    <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i>
+        <%= message %>
+    </div>
+<% } %>
+
+<% if (error) { %>
+    <div class="alert alert-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <%= error %>
+    </div>
+<% } %>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i class="fa-solid fa-truck-field"></i>
+        </div>
+        <div>
+            <span>Total Supplier</span>
+            <h2><%= suppliers.length %></h2>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+            <span>Status Data</span>
+            <h2>Aktif</h2>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-heading">
+        <div>
+            <h3>Daftar Supplier</h3>
+            <p>Informasi seluruh supplier terdaftar.</p>
         </div>
 
-        <% if (message) { %>
-            <div class="alert alert-success">
-                <i class="fa-solid fa-circle-check"></i>
-                <%= message %>
-            </div>
-        <% } %>
-
-        <% if (error) { %>
-            <div class="alert alert-error">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <%= error %>
-            </div>
-        <% } %>
-
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-icon purple">
-                    <i class="fa-solid fa-truck-field"></i>
-                </div>
-                <div>
-                    <span>Total Supplier</span>
-                    <h2><%= suppliers.length %></h2>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon green">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-                <div>
-                    <span>Status Data</span>
-                    <h2>Aktif</h2>
-                </div>
-            </div>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="supplierSearch" placeholder="Cari supplier...">
         </div>
+    </div>
 
-        <div class="content-card">
-            <div class="card-heading">
-                <div>
-                    <h3>Daftar Supplier</h3>
-                    <p>Informasi seluruh supplier terdaftar.</p>
-                </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="supplierTable">
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>NAMA SUPPLIER</th>
+                    <th>TELEPON</th>
+                    <th>EMAIL</th>
+                    <th>ALAMAT</th>
+                    <th>AKSI</th>
+                </tr>
+            </thead>
 
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input
-                        type="text"
-                        id="supplierSearch"
-                        placeholder="Cari supplier..."
-                    >
-                </div>
-            </div>
-
-            <div class="table-wrapper">
-                <table class="data-table" id="supplierTable">
-                    <thead>
+            <tbody>
+                <% if (suppliers.length > 0) { %>
+                    <% suppliers.forEach((supplier, index) => { %>
                         <tr>
-                            <th>NO</th>
-                            <th>NAMA SUPPLIER</th>
-                            <th>TELEPON</th>
-                            <th>EMAIL</th>
-                            <th>ALAMAT</th>
-                            <th>AKSI</th>
+                            <td><%= index + 1 %></td>
+
+                            <td>
+                                <div class="supplier-name">
+                                    <div class="supplier-avatar">
+                                        <%= supplier.nama.charAt(0).toUpperCase() %>
+                                    </div>
+                                    <strong><%= supplier.nama %></strong>
+                                </div>
+                            </td>
+
+                            <td><%= supplier.telepon %></td>
+                            <td><%= supplier.email %></td>
+                            <td class="address-cell"><%= supplier.alamat %></td>
+
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="/supplier/<%= supplier.id %>/edit" class="btn-icon edit" title="Edit">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+                                    <form
+                                        action="/supplier/<%= supplier.id %>/delete"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus supplier ini?')"
+                                    >
+                                        <button type="submit" class="btn-icon delete" title="Hapus">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="fa-solid fa-box-open"></i>
+                            <strong>Belum ada data supplier</strong>
+                            <span>Tambahkan supplier pertama untuk memulai.</span>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
 
-                    <tbody>
-                        <% if (suppliers.length > 0) { %>
-                            <% suppliers.forEach((supplier, index) => { %>
-                                <tr>
-                                    <td><%= index + 1 %></td>
-
-                                    <td>
-                                        <div class="supplier-name">
-                                            <div class="supplier-avatar">
-                                                <%= supplier.nama.charAt(0).toUpperCase() %>
-                                            </div>
-                                            <strong><%= supplier.nama %></strong>
-                                        </div>
-                                    </td>
-
-                                    <td><%= supplier.telepon %></td>
-                                    <td><%= supplier.email %></td>
-
-                                    <td class="address-cell">
-                                        <%= supplier.alamat %>
-                                    </td>
-
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a
-                                                href="/supplier/<%= supplier.id %>/edit"
-                                                class="btn-icon edit"
-                                                title="Edit"
-                                            >
-                                                <i class="fa-solid fa-pen"></i>
-                                            </a>
-
-                                            <form
-                                                action="/supplier/<%= supplier.id %>/delete"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus supplier ini?')"
-                                            >
-                                                <button
-                                                    type="submit"
-                                                    class="btn-icon delete"
-                                                    title="Hapus"
-                                                >
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        <% } else { %>
-                            <tr>
-                                <td colspan="6" class="empty-state">
-                                    <i class="fa-solid fa-box-open"></i>
-                                    <strong>Belum ada data supplier</strong>
-                                    <span>Tambahkan supplier pertama untuk memulai.</span>
-                                </td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="table-footer">
-                Menampilkan <strong><%= suppliers.length %></strong> data supplier
-            </div>
-        </div>
-    </section>
-
-    <%- include('../partials/footer') %>
-</main>
+    <div class="table-footer">
+        Menampilkan <strong><%= suppliers.length %></strong> data supplier
+    </div>
+</div>
 
 <script>
     const searchInput = document.getElementById('supplierSearch');
@@ -170,3 +146,5 @@
         });
     });
 </script>
+
+<%- include('../partials/footer') %>
