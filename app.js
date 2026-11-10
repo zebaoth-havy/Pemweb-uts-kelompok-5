@@ -1,3 +1,4 @@
+
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
@@ -16,15 +17,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Barang routes
+// ==============================
+// ROUTES
+// ==============================
+
+// Barang
 const barangRoutes = require('./routes/barangRoutes');
 app.use('/barang', barangRoutes);
 
-// Barang Masuk routes
+// Barang Masuk
 const masukRoutes = require('./routes/masukRoutes');
 app.use('/barang-masuk', masukRoutes);
 
-// Dashboard
+// Supplier
+const supplierRoutes = require('./routes/supplierRoutes');
+app.use('/supplier', supplierRoutes);
+
+// Barang Keluar
+const keluarRoutes = require('./routes/keluarRoutes');
+app.use('/barang-keluar', keluarRoutes);
+
+// ==============================
+// DASHBOARD
+// ==============================
+
 app.get('/', async (req, res) => {
     try {
         const [barang] = await db.query(
@@ -53,26 +69,40 @@ app.get('/', async (req, res) => {
 
     } catch (error) {
         console.error('Dashboard error:', error);
-        res.status(500).send('Gagal memuat dashboard: ' + error.message);
+        res.status(500).send(
+            'Gagal memuat dashboard: ' + error.message
+        );
     }
 });
 
-// 404 handler
+// ==============================
+// 404 HANDLER
+// ==============================
+
 app.use((req, res) => {
     res.status(404).send('Halaman tidak ditemukan.');
 });
 
-// Server
+// ==============================
+// SERVER
+// ==============================
+
 async function startServer() {
     try {
         await testConnection();
 
         app.listen(PORT, () => {
-            console.log(`StockFlow berjalan di http://localhost:${PORT}`);
+            console.log(
+                `StockFlow berjalan di http://localhost:${PORT}`
+            );
         });
 
     } catch (error) {
-        console.error('Server gagal dijalankan:', error.message);
+        console.error(
+            'Server gagal dijalankan:',
+            error.message
+        );
+
         process.exit(1);
     }
 }
