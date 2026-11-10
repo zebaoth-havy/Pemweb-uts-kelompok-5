@@ -1,118 +1,107 @@
-
 <%- include('../partials/header') %>
-<%- include('../partials/sidebar', { currentPage: 'supplier' }) %>
+<%- include('../partials/navbar') %>
 
-<main class="main-content">
-    <%- include('../partials/navbar') %>
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTORY / MASTER DATA / SUPPLIER</span>
+        <h1><%= title %></h1>
+        <p>Lengkapi informasi supplier dengan benar.</p>
+    </div>
 
-    <section class="page-content">
-        <div class="page-heading">
-            <div>
-                <span class="eyebrow">MASTER DATA / SUPPLIER</span>
-                <h1><%= title %></h1>
-                <p>Lengkapi informasi supplier dengan benar.</p>
-            </div>
+    <a href="/supplier" class="btn btn-outline">
+        <i class="fa-solid fa-arrow-left"></i>
+        Kembali
+    </a>
+</div>
 
-            <a href="/supplier" class="btn btn-outline">
-                <i class="fa-solid fa-arrow-left"></i>
-                Kembali
-            </a>
+<div class="content-card form-card">
+    <div class="card-heading">
+        <div>
+            <h3>Informasi Supplier</h3>
+            <p>Masukkan detail pemasok barang.</p>
         </div>
+        <div class="form-icon">
+            <i class="fa-solid fa-truck-field"></i>
+        </div>
+    </div>
 
-        <div class="content-card form-card">
-            <div class="card-heading">
-                <div>
-                    <h3>Informasi Supplier</h3>
-                    <p>Masukkan detail pemasok barang.</p>
-                </div>
-                <div class="form-icon">
-                    <i class="fa-solid fa-truck-field"></i>
-                </div>
-            </div>
+    <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-error">
+            <strong>Periksa kembali data Anda:</strong>
+            <ul>
+                <% errors.forEach(error => { %>
+                    <li><%= error %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
 
-            <% if (errors && errors.length > 0) { %>
-                <div class="alert alert-error">
-                    <div>
-                        <strong>Periksa kembali data Anda:</strong>
-                        <ul>
-                            <% errors.forEach(error => { %>
-                                <li><%= error %></li>
-                            <% }) %>
-                        </ul>
-                    </div>
-                </div>
-            <% } %>
-
-            <form
-                action="<%= supplier.id ? '/supplier/' + supplier.id + '/edit' : '/supplier/tambah' %>"
-                method="POST"
-                class="supplier-form"
+    <form
+        action="<%= supplier.id ? '/supplier/' + supplier.id + '/edit' : '/supplier/tambah' %>"
+        method="POST"
+        class="supplier-form"
+    >
+        <div class="form-group">
+            <label for="nama">Nama Supplier <span>*</span></label>
+            <input
+                type="text"
+                id="nama"
+                name="nama"
+                placeholder="Contoh: PT Sumber Makmur"
+                value="<%= supplier.nama || '' %>"
+                required
             >
-                <div class="form-group">
-                    <label for="nama">Nama Supplier <span>*</span></label>
-                    <input
-                        type="text"
-                        id="nama"
-                        name="nama"
-                        placeholder="Contoh: PT Sumber Makmur"
-                        value="<%= supplier.nama || '' %>"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="telepon">Nomor Telepon <span>*</span></label>
-                    <input
-                        type="tel"
-                        id="telepon"
-                        name="telepon"
-                        placeholder="Contoh: 081234567890"
-                        value="<%= supplier.telepon || '' %>"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email <span>*</span></label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="supplier@email.com"
-                        value="<%= supplier.email || '' %>"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="alamat">Alamat <span>*</span></label>
-                    <textarea
-                        id="alamat"
-                        name="alamat"
-                        rows="4"
-                        placeholder="Masukkan alamat lengkap supplier..."
-                        required
-                    ><%= supplier.alamat || '' %></textarea>
-                </div>
-
-                <div class="form-note">
-                    <i class="fa-solid fa-circle-info"></i>
-                    Pastikan informasi supplier sudah benar sebelum disimpan.
-                </div>
-
-                <div class="form-actions">
-                    <a href="/supplier" class="btn btn-outline">Batal</a>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <%= supplier.id ? 'Simpan Perubahan' : 'Simpan Supplier' %>
-                    </button>
-                </div>
-            </form>
         </div>
-    </section>
 
-    <%- include('../partials/footer') %>
-</main>
-</body>
-</html>
+        <div class="form-group">
+            <label for="telepon">Nomor Telepon <span>*</span></label>
+            <input
+                type="tel"
+                id="telepon"
+                name="telepon"
+                placeholder="Contoh: 081234567890"
+                value="<%= supplier.telepon || '' %>"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email <span>*</span></label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="supplier@email.com"
+                value="<%= supplier.email || '' %>"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="alamat">Alamat <span>*</span></label>
+            <textarea
+                id="alamat"
+                name="alamat"
+                rows="4"
+                placeholder="Masukkan alamat lengkap supplier..."
+                required
+            ><%= supplier.alamat || '' %></textarea>
+        </div>
+
+        <div class="form-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Pastikan informasi supplier sudah benar sebelum disimpan.
+        </div>
+
+        <div class="form-actions">
+            <a href="/supplier" class="btn btn-outline">Batal</a>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <%= supplier.id ? 'Simpan Perubahan' : 'Simpan Supplier' %>
+            </button>
+        </div>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>
