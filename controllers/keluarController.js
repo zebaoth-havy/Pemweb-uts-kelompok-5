@@ -1,185 +1,156 @@
+const Keluar = require('../models/keluarModel');
 
-const keluarModel = require("../models/keluarModel");
+const validateInput = (data) => {
+    const barang_id = Number(data.barang_id);
+    const jumlah = Number(data.jumlah);
+    const tanggal = data.tanggal;
+    const tujuan = (data.tujuan || '').trim();
 
-// Fungsi untuk memeriksa ID dan jumlah bilangan bulat positif
-const validAngka = (nilai) => {
-  return /^[1-9]\d*$/.test(String(nilai || "")) &&
-    Number.isSafeInteger(Number(nilai));
+    if (!Number.isInteger(barang_id) || barang_id <= 0) {
+        return { error: 'Silakan pilih barang yang valid.' };
+    }
+
+    if (!Number.isInteger(jumlah) || jumlah <= 0) {
+        return { error: 'Jumlah barang harus berupa angka positif.' };
+    }
+
+    if (!tanggal || !/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) {
+        return { error: 'Tanggal transaksi tidak valid.' };
+    }
+
+    const date = new Date(`${tanggal}T00:00:00Z`);
+
+    if (
+        Number.isNaN(date.getTime()) ||
+        date.toISOString().slice(0, 10) !== tanggal
+    ) {
+        return { error: 'Tanggal transaksi tidak valid.' };
+    }
+
+    if (!tujuan) {
+        return { error: 'Tujuan barang wajib diisi.' };
+    }
+
+    return {
+        data: { barang_id, jumlah, tanggal, tujuan }
+    };
 };
 
-// Fungsi untuk memvalidasi input transaksi
-const validTransaksi = (data) => {
-  return (
-    validAngka(data.barang_id) &&
-    validAngka(data.jumlah) &&
-    typeof data.tanggal === "string" &&
-    /^\d{4}-\d{2}-\d{2}$/.test(data.tanggal) &&
-    !Number.isNaN(Date.parse(data.tanggal)) &&
-    typeof data.tujuan === "string" &&
-    data.tujuan.trim().length > 0 &&
-    data.tujuan.trim().length <= 255
-  );
-};
-
-// READ - Menampilkan seluruh transaksi barang keluar
+// READ
 exports.index = async (req, res) => {
-  try {
-    // Mengambil daftar transaksi melalui Model
-    const transaksi = await keluarModel.getAll();
+    try {
+        const transaksi = await Keluar.getAll();
 
-    // Menampilkan data pada halaman EJS
-    return res.render("barang-keluar/index", {
-      title: "Data Barang Keluar",
-      transaksi: transaksi
-    });
-
-  } catch (error) {
-    // Mencatat error pada terminal
-    console.error(error);
-
-    return res.status(500).send("Gagal mengambil data");
-  }
-};
-
-// CREATE - Menampilkan halaman tambah transaksi
-exports.formTambah = async (req, res) => {
-  try {
-    // Mengambil daftar barang untuk dropdown
-    const barang = await keluarModel.getBarang();
-
-    return res.render("barang-keluar/tambah", {
-      title: "Tambah Barang Keluar",
-      barang: barang
-    });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Gagal menampilkan form");
-  }
-};
-
-// CREATE - Menyimpan transaksi barang keluar
-exports.tambah = async (req, res) => {
-  try {
-    // Mengambil data dari formulir
-    const { barang_id, tanggal, jumlah, tujuan } = req.body;
-
-    // Melakukan validasi input di server
-    if (!validTransaksi(req.body)) {
-      return res.redirect("/barang-keluar/tambah");
+        res.render('barang-keluar/index', {
+            transaksi,
+            success: req.query.success || null,
+            error: req.query.error || null
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Gagal mengambil data barang keluar.');
     }
-
-    // Memanggil Model untuk menyimpan transaksi
-    // dan mengurangi stok secara atomik
-    await keluarModel.create({
-      barang_id: Number(barang_id),
-      tanggal: tanggal,
-      jumlah: Number(jumlah),
-      tujuan: tujuan.trim()
-    });
-
-    // PRG - Mengalihkan halaman setelah POST
-    return res.redirect("/barang-keluar");
-
-  } catch (error) {
-    console.error(error);
-
-    // Kembali ke formulir jika transaksi gagal
-    return res.redirect("/barang-keluar/tambah");
-  }
 };
 
-// UPDATE - Menampilkan formulir edit
-exports.formEdit = async (req, res) => {
-  try {
-    // Mengambil ID dari parameter URL
-    const id = req.params.id;
+// FORM TAMBAH
+exports.createForm = async (req, res) => {
+    try {
+        const barang = await Keluar.getBarang();
 
-    // Memeriksa apakah ID valid
-    if (!validAngka(id)) {
-      return res.status(400).send("ID tidak valid");
+        res.render('barang-keluar/form', {
+            title: 'Tambah Barang Keluar',
+            transaksi: {},
+            barang,
+            errors: []
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Gagal membuka form barang keluar.');
     }
-
-    // Mengambil transaksi berdasarkan ID
-    const transaksi = await keluarModel.getById(Number(id));
-
-    // Memeriksa apakah transaksi ditemukan
-    if (!transaksi) {
-      return res.status(404).send("Transaksi tidak ditemukan");
-    }
-
-    // Mengambil daftar barang untuk dropdown
-    const barang = await keluarModel.getBarang();
-
-    // Menampilkan formulir dengan data awal terisi
-    return res.render("barang-keluar/edit", {
-      title: "Edit Barang Keluar",
-      transaksi: transaksi,
-      barang: barang
-    });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Gagal menampilkan form edit");
-  }
 };
 
-// UPDATE - Menyimpan perubahan transaksi
+// SIMPAN
+exports.store = async (req, res) => {
+    try {
+        const validation = validateInput(req.body);
+
+        if (validation.error) {
+            return res.redirect(
+                '/barang-keluar/tambah?error=' +
+                encodeURIComponent(validation.error)
+            );
+        }
+
+        await Keluar.create(validation.data);
+
+        res.redirect('/barang-keluar?success=' +
+            encodeURIComponent('Barang keluar berhasil ditambahkan.'));
+    } catch (error) {
+        console.error(error);
+
+        res.redirect('/barang-keluar?error=' +
+            encodeURIComponent(error.message));
+    }
+};
+
+// FORM EDIT
+exports.editForm = async (req, res) => {
+    try {
+        const transaksi = await Keluar.getById(req.params.id);
+
+        if (!transaksi) {
+            return res.status(404).send('Data barang keluar tidak ditemukan.');
+        }
+
+        const barang = await Keluar.getBarang();
+
+        res.render('barang-keluar/form', {
+            title: 'Edit Barang Keluar',
+            transaksi,
+            barang,
+            errors: []
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Gagal membuka data barang keluar.');
+    }
+};
+
+// UPDATE
 exports.update = async (req, res) => {
-  // Mengambil ID transaksi dari URL
-  const id = req.params.id;
+    try {
+        const validation = validateInput(req.body);
 
-  // Memastikan ID valid sebelum digunakan
-  if (!validAngka(id)) {
-    return res.redirect("/barang-keluar");
-  }
+        if (validation.error) {
+            return res.redirect(
+                `/barang-keluar/${req.params.id}/edit?error=` +
+                encodeURIComponent(validation.error)
+            );
+        }
 
-  try {
-    // Mengambil data terbaru dari formulir
-    const { barang_id, tanggal, jumlah, tujuan } = req.body;
+        await Keluar.update(req.params.id, validation.data);
 
-    // Memvalidasi data yang dikirim pengguna
-    if (!validTransaksi(req.body)) {
-      return res.redirect("/barang-keluar");
+        res.redirect('/barang-keluar?success=' +
+            encodeURIComponent('Data barang keluar berhasil diperbarui.'));
+    } catch (error) {
+        console.error(error);
+
+        res.redirect('/barang-keluar?error=' +
+            encodeURIComponent(error.message));
     }
-
-    // Memperbarui transaksi melalui Model
-    // Model bertanggung jawab menyesuaikan stok
-    await keluarModel.update(Number(id), {
-      barang_id: Number(barang_id),
-      tanggal: tanggal,
-      jumlah: Number(jumlah),
-      tujuan: tujuan.trim()
-    });
-
-    // PRG - Kembali ke halaman daftar transaksi
-    return res.redirect("/barang-keluar");
-
-  } catch (error) {
-    console.error(error);
-    return res.redirect("/barang-keluar");
-  }
 };
 
-// DELETE - Menghapus transaksi barang keluar
-exports.hapus = async (req, res) => {
-  try {
-    // Mengambil ID dari parameter URL
-    const id = req.params.id;
+// DELETE
+exports.destroy = async (req, res) => {
+    try {
+        await Keluar.deleteData(req.params.id);
 
-    // Memeriksa ID sebelum memanggil Model
-    if (!validAngka(id)) {
-      return res.redirect("/barang-keluar");
+        res.redirect('/barang-keluar?success=' +
+            encodeURIComponent('Data barang keluar berhasil dihapus.'));
+    } catch (error) {
+        console.error(error);
+
+        res.redirect('/barang-keluar?error=' +
+            encodeURIComponent(error.message));
     }
-
-    // Menghapus transaksi dan mengembalikan stok
-    await keluarModel.delete(Number(id));
-
-    // PRG - Redirect setelah proses hapus
-    return res.redirect("/barang-keluar");
-
-  } catch (error) {
-    console.error(error);
-    return res.redirect("/barang-keluar");
-  }
 };
